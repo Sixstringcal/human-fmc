@@ -1,0 +1,27 @@
+{
+  "name": "human-fmc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "tsc && node dist/app.js",
+    "lint": "eslint . --ext .ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sixstringcal/human-fmc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sixstringcal/human-fmc/issues"
+  },
+  "homepage": "https://github.com/Sixstringcal/human-fmc#readme",
+  "devDependencies": {
+    "@types/node": "^20.8.6",
+    "eslint": "^8.51.0",
+    "typescript": "^5.2.2"
+  }
+}
