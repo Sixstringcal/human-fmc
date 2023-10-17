@@ -161,10 +161,10 @@ class RubiksCube {
   // Check if the cube is solved
   isSolved(): boolean {
     return (
-      this.edgeOrientation === this.solvedEdgeOrientation &&
-      this.cornerOrientation === this.solvedCornerOrientation &&
-      this.edgePermutation === this.solvedEdgePermutation &&
-      this.cornerPermutation === this.solvedCornerPermutation
+      this.arraysEqual(this.edgeOrientation, this.solvedEdgeOrientation) &&
+      this.arraysEqual(this.cornerOrientation, this.solvedCornerOrientation) &&
+      this.arraysEqual(this.edgePermutation, this.solvedEdgePermutation) &&
+      this.arraysEqual(this.cornerPermutation, this.solvedCornerPermutation)
     );
   }
 
@@ -174,11 +174,16 @@ class RubiksCube {
 
   udDrSolved(): boolean {
     return (
-      this.edgeOrientation === this.solvedEdgeOrientation &&
-      this.cornerOrientation === this.solvedCornerOrientation
+      this.arraysEqual(this.edgeOrientation, this.solvedEdgeOrientation) &&
+      this.arraysEqual(this.cornerOrientation, this.solvedCornerOrientation)
     );
   }
 
-
+  private arraysEqual(arr1: any[], arr2: any[]): boolean {
+    if (arr1.length !== arr2.length) return false;
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) return false;
+    }
+    return true;
+  }
 }
-
