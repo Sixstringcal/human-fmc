@@ -58,129 +58,199 @@ function solve(scramble) {
     const eoLengthMax = 6;
     const eo = solveEo(scramble, "", eoLengthMax);
     console.log(`${eo.length} EOs have been found with a max of ${eoLengthMax} moves.`);
-    const dr = solveDrFirst(scramble, eo, 11);
-    console.log(`DR result: ${dr}`);
-    return dr;
+    const drLengthMax = 11;
+    const dr = solveDrFirst(scramble, eo, drLengthMax);
+    console.log(`${dr.length} DRs have been found with a max of ${drLengthMax} moves.`);
+    const htrLengthMax = 18;
+    const htr = solveHtrFirst(scramble, dr, htrLengthMax);
+    return "";
+}
+function solveHtrFirst(scramble, solutions, toBeat) {
+    let htr = [];
+    solutions.forEach((solution) => {
+        htr = [...htr, ...solveHtr(scramble, solution, toBeat)];
+    });
+    return htr;
+}
+function cpSolvedIn4MovesMax(scramble, solution, movesLeft) {
+    let moves = solution.split(" ");
+    let lastMove = moves[moves.length - 1][0];
+    let secondToLastMove = moves[moves.length - 1][0];
+    const cube = new _3x3_1.RubiksCube();
+    cube.applyMoves(scramble);
+    cube.applyMoves(solution);
+    if (cube.cpSolved()) {
+        return true;
+    }
+    if (movesLeft === 0) {
+        return false;
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "L" && secondToLastMove === "R") || lastMove === "R")) {
+        if (cpSolvedIn4MovesMax(scramble, `${solution} R2`, movesLeft - 1)) {
+            return true;
+        }
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "R" && secondToLastMove === "L") || lastMove === "L")) {
+        if (cpSolvedIn4MovesMax(scramble, `${solution} L2`, movesLeft - 1)) {
+            return true;
+        }
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "B" && secondToLastMove === "F") || lastMove === "F")) {
+        if (cpSolvedIn4MovesMax(scramble, `${solution} F2`, movesLeft - 1)) {
+            return true;
+        }
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "F" && secondToLastMove === "B") || lastMove === "B")) {
+        if (cpSolvedIn4MovesMax(scramble, `${solution} B2`, movesLeft - 1)) {
+            return true;
+        }
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "D" && secondToLastMove === "U") || lastMove === "U")) {
+        if (cpSolvedIn4MovesMax(scramble, `${solution} U2`, movesLeft - 1)) {
+            return true;
+        }
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "U" && secondToLastMove === "D") || lastMove === "D")) {
+        if (cpSolvedIn4MovesMax(scramble, `${solution} D2`, movesLeft - 1)) {
+            return true;
+        }
+    }
+    return false;
+}
+function solveHtr(scramble, solution, toBeat) {
+    const cube = new _3x3_1.RubiksCube();
+    let eoList = [];
+    cube.applyMoves(scramble);
+    cube.applyMoves(solution);
+    if (cube.allOpposites() && cpSolvedIn4MovesMax(scramble, solution, 4)) {
+        console.log(`eo found: ${solution}`);
+        return [solution];
+    }
+    cube.solve();
+    if (solution.split(" ").length > toBeat) {
+        return [];
+    }
+    let rp = [];
+    let moves = solution.split(" ");
+    let lastMove = moves[moves.length - 1][0];
+    let secondToLastMove = moves[moves.length - 1][0];
+    if (solution.length === 0 ||
+        !((lastMove === "L" && secondToLastMove === "R") || lastMove === "R")) {
+        rp = solveHtr(scramble, `${solution} R2`, toBeat);
+        eoList = [...eoList, ...rp];
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "R" && secondToLastMove === "L") || lastMove === "L")) {
+        rp = solveHtr(scramble, `${solution} L2`, toBeat);
+        eoList = [...eoList, ...rp];
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "B" && secondToLastMove === "F") || lastMove === "F")) {
+        rp = solveHtr(scramble, `${solution} F2`, toBeat);
+        eoList = [...eoList, ...rp];
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "F" && secondToLastMove === "B") || lastMove === "B")) {
+        rp = solveHtr(scramble, `${solution} B2`, toBeat);
+        eoList = [...eoList, ...rp];
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "D" && secondToLastMove === "U") || lastMove === "U")) {
+        rp = solveHtr(scramble, `${solution} U`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveHtr(scramble, `${solution} U'`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveHtr(scramble, `${solution} U2`, toBeat);
+        eoList = [...eoList, ...rp];
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "U" && secondToLastMove === "D") || lastMove === "D")) {
+        rp = solveHtr(scramble, `${solution} D`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveHtr(scramble, `${solution} D'`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveHtr(scramble, `${solution} D2`, toBeat);
+        eoList = [...eoList, ...rp];
+    }
+    return eoList;
 }
 function solveDrFirst(scramble, solutions, toBeat) {
-    let dr = "D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D";
-    let temp = "";
+    let dr = [];
     solutions.forEach((solution) => {
-        temp = solveDr(scramble, solution, Math.min(toBeat, dr.split(" ").length));
-        if (temp.split(" ").length < dr.split(" ").length) {
-            dr = temp;
-        }
+        dr = [...dr, ...solveDr(scramble, solution, toBeat)];
     });
     return dr;
 }
 function solveDr(scramble, solution, toBeat) {
     const cube = new _3x3_1.RubiksCube();
+    let eoList = [];
     cube.applyMoves(scramble);
     cube.applyMoves(solution);
-    if (cube.udDrSolved()) {
-        console.log(`dr found: ${solution}`);
-        return solution;
+    if (cube.fbEoSovled()) {
+        // console.log(`eo found: ${solution}`);
+        return [solution];
     }
     cube.solve();
     if (solution.split(" ").length > toBeat) {
-        return (solution +
-            "D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D");
+        return [];
     }
-    let rp = "";
+    let rp = [];
     let moves = solution.split(" ");
     let lastMove = moves[moves.length - 1][0];
     let secondToLastMove = moves[moves.length - 1][0];
-    let eo = "D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D";
     if (solution.length === 0 ||
         !((lastMove === "L" && secondToLastMove === "R") || lastMove === "R")) {
-        rp = solveDr(scramble, `${solution} R`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-        rp = solveDr(scramble, `${solution} R'`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-        rp = solveDr(scramble, `${solution} R2`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-    }
-    if (solution.length === 5) {
-        console.log(`R done!  ToBeat: ${Math.min(toBeat, eo.split(" ").length)}`);
+        rp = solveDr(scramble, `${solution} R`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveDr(scramble, `${solution} R'`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveDr(scramble, `${solution} R2`, toBeat);
+        eoList = [...eoList, ...rp];
     }
     if (solution.length === 0 ||
         !((lastMove === "R" && secondToLastMove === "L") || lastMove === "L")) {
-        rp = solveDr(scramble, `${solution} L`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-        rp = solveDr(scramble, `${solution} L'`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-        rp = solveDr(scramble, `${solution} L2`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-    }
-    if (scramble.length === 0) {
-        console.log(`L done!  ToBeat: ${Math.min(toBeat, eo.split(" ").length)}`);
+        rp = solveDr(scramble, `${solution} L`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveDr(scramble, `${solution} L'`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveDr(scramble, `${solution} L2`, toBeat);
+        eoList = [...eoList, ...rp];
     }
     if (solution.length === 0 ||
         !((lastMove === "B" && secondToLastMove === "F") || lastMove === "F")) {
-        rp = solveDr(scramble, `${solution} F2`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-    }
-    if (scramble.length === 0) {
-        console.log(`F done!  ToBeat: ${Math.min(toBeat, eo.split(" ").length)}`);
+        rp = solveDr(scramble, `${solution} F2`, toBeat);
+        eoList = [...eoList, ...rp];
     }
     if (solution.length === 0 ||
         !((lastMove === "F" && secondToLastMove === "B") || lastMove === "B")) {
-        rp = solveDr(scramble, `${solution} B2`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-    }
-    if (scramble.length === 0) {
-        console.log(`B done!  ToBeat: ${Math.min(toBeat, eo.split(" ").length)}`);
+        rp = solveDr(scramble, `${solution} B2`, toBeat);
+        eoList = [...eoList, ...rp];
     }
     if (solution.length === 0 ||
         !((lastMove === "D" && secondToLastMove === "U") || lastMove === "U")) {
-        rp = solveDr(scramble, `${solution} U`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-        rp = solveDr(scramble, `${solution} U'`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-        rp = solveDr(scramble, `${solution} U2`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-    }
-    if (scramble.length === 0) {
-        console.log(`U done!  ToBeat: ${Math.min(toBeat, eo.split(" ").length)}`);
+        rp = solveDr(scramble, `${solution} U`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveDr(scramble, `${solution} U'`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveDr(scramble, `${solution} U2`, toBeat);
+        eoList = [...eoList, ...rp];
     }
     if (solution.length === 0 ||
         !((lastMove === "U" && secondToLastMove === "D") || lastMove === "D")) {
-        rp = solveDr(scramble, `${solution} D`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-        rp = solveDr(scramble, `${solution} D'`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
-        rp = solveDr(scramble, `${solution} D2`, Math.min(toBeat, eo.split(" ").length));
-        if (eo.split(" ").length > rp.split(" ").length) {
-            eo = rp;
-        }
+        rp = solveDr(scramble, `${solution} D`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveDr(scramble, `${solution} D'`, toBeat);
+        eoList = [...eoList, ...rp];
+        rp = solveDr(scramble, `${solution} D2`, toBeat);
+        eoList = [...eoList, ...rp];
     }
-    return eo;
+    return eoList;
 }
 function solveEo(scramble, solution, toBeat) {
     const cube = new _3x3_1.RubiksCube();

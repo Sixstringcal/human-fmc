@@ -217,7 +217,7 @@ function solveDr(scramble: string, solution: string, toBeat: number): string[] {
   let eoList = [];
   cube.applyMoves(scramble);
   cube.applyMoves(solution);
-  if (cube.fbEoSovled()) {
+  if (cube.udDrSolved()) {
     // console.log(`eo found: ${solution}`);
     return [solution];
   }
