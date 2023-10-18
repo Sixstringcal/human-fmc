@@ -55,15 +55,90 @@ function solve(scramble) {
     //   const cube: RubiksCube = new RubiksCube();
     //   cube.applyMoves(scramble);
     //   console.log(cube.cornerOrientation);
-    const eoLengthMax = 6;
+    const eoLengthMax = 7;
     const eo = solveEo(scramble, "", eoLengthMax);
     console.log(`${eo.length} EOs have been found with a max of ${eoLengthMax} moves.`);
-    const drLengthMax = 11;
+    const drLengthMax = 13;
     const dr = solveDrFirst(scramble, eo, drLengthMax);
     console.log(`${dr.length} DRs have been found with a max of ${drLengthMax} moves.`);
-    const htrLengthMax = 18;
+    const htrLengthMax = 19;
     const htr = solveHtrFirst(scramble, dr, htrLengthMax);
-    return "";
+    console.log(`${htr.length} HTRs have been found with a max of ${htrLengthMax} moves.`);
+    const solutionMax = 24;
+    const solution = solveFirst(scramble, htr, solutionMax);
+    return solution;
+}
+function solveFirst(scramble, solutions, toBeat) {
+    let temp = "";
+    let bestHtr = "D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D";
+    solutions.forEach((solution) => {
+        temp = solvePuzzle(scramble, solution, Math.min(toBeat, bestHtr.split(" ").length));
+        if (temp.split(" ").length <= bestHtr.split(" ").length) {
+            bestHtr = temp;
+        }
+    });
+    return bestHtr;
+}
+function solvePuzzle(scramble, solution, toBeat) {
+    const cube = new _3x3_1.RubiksCube();
+    let bestSoFar = "D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D";
+    cube.applyMoves(scramble);
+    cube.applyMoves(solution);
+    if (cube.isSolved()) {
+        console.log(`Solution found: ${solution}`);
+        return solution;
+    }
+    cube.solve();
+    if (solution.split(" ").length > toBeat) {
+        return "D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D D";
+    }
+    let temp = "";
+    let moves = solution.split(" ");
+    let lastMove = moves[moves.length - 1][0];
+    let secondToLastMove = moves[moves.length - 1][0];
+    if (solution.length === 0 ||
+        !((lastMove === "L" && secondToLastMove === "R") || lastMove === "R")) {
+        temp = solvePuzzle(scramble, `${solution} R2`, Math.min(toBeat, bestSoFar.split(" ").length));
+        if (temp.split(" ").length <= bestSoFar.split(" ").length) {
+            bestSoFar = temp;
+        }
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "R" && secondToLastMove === "L") || lastMove === "L")) {
+        temp = solvePuzzle(scramble, `${solution} L2`, Math.min(toBeat, bestSoFar.split(" ").length));
+        if (temp.split(" ").length <= bestSoFar.split(" ").length) {
+            bestSoFar = temp;
+        }
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "B" && secondToLastMove === "F") || lastMove === "F")) {
+        temp = solvePuzzle(scramble, `${solution} F2`, Math.min(toBeat, bestSoFar.split(" ").length));
+        if (temp.split(" ").length <= bestSoFar.split(" ").length) {
+            bestSoFar = temp;
+        }
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "F" && secondToLastMove === "B") || lastMove === "B")) {
+        temp = solvePuzzle(scramble, `${solution} B2`, Math.min(toBeat, bestSoFar.split(" ").length));
+        if (temp.split(" ").length <= bestSoFar.split(" ").length) {
+            bestSoFar = temp;
+        }
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "D" && secondToLastMove === "U") || lastMove === "U")) {
+        temp = solvePuzzle(scramble, `${solution} U2`, Math.min(toBeat, bestSoFar.split(" ").length));
+        if (temp.split(" ").length <= bestSoFar.split(" ").length) {
+            bestSoFar = temp;
+        }
+    }
+    if (solution.length === 0 ||
+        !((lastMove === "U" && secondToLastMove === "D") || lastMove === "D")) {
+        temp = solvePuzzle(scramble, `${solution} D2`, Math.min(toBeat, bestSoFar.split(" ").length));
+        if (temp.split(" ").length <= bestSoFar.split(" ").length) {
+            bestSoFar = temp;
+        }
+    }
+    return bestSoFar;
 }
 function solveHtrFirst(scramble, solutions, toBeat) {
     let htr = [];
@@ -129,7 +204,7 @@ function solveHtr(scramble, solution, toBeat) {
     cube.applyMoves(scramble);
     cube.applyMoves(solution);
     if (cube.allOpposites() && cpSolvedIn4MovesMax(scramble, solution, 4)) {
-        console.log(`eo found: ${solution}`);
+        console.log(`HTR found: ${solution}`);
         return [solution];
     }
     cube.solve();
