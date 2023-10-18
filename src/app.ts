@@ -128,7 +128,7 @@ function solveHtr(
   cube.applyMoves(scramble);
   cube.applyMoves(solution);
   if (cube.allOpposites() && cpSolvedIn4MovesMax(scramble, solution, 4)) {
-    console.log(`eo found: ${solution}`);
+    console.log(`HTR found: ${solution}`);
     return [solution];
   }
   cube.solve();
