@@ -33,7 +33,7 @@ function solve(scramble: string): string {
   console.log(
     `${dr.length} DRs have been found with a max of ${drLengthMax} moves.`
   );
-  const htrLengthMax = 18;
+  const htrLengthMax = 19;
   const htr = solveHtrFirst(scramble, dr, htrLengthMax);
   return "";
 }
