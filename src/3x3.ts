@@ -24,6 +24,13 @@ class RubiksCube {
     this.cornerPermutation = this.solvedCornerPermutation;
   }
 
+  cpSolved() {
+    return this.arraysEqual(
+      this.cornerPermutation,
+      this.solvedCornerPermutation
+    );
+  }
+
   // Apply a sequence of moves to the cube
   applyMoves(moves: string) {
     const moveRegex = /([RULDFB])([2']?)/g;
@@ -222,6 +229,52 @@ class RubiksCube {
       this.edgePermutation[6] < 8 &&
       this.edgePermutation[7] > 3 &&
       this.edgePermutation[7] < 8
+    );
+  }
+
+  allOpposites(): boolean {
+    return (
+      this.udDrSolved &&
+      this.cornerPermutation[0] % 2 === 0 &&
+      this.cornerPermutation[2] % 2 === 0 &&
+      this.cornerPermutation[4] % 2 === 0 &&
+      this.cornerPermutation[6] % 2 === 0 &&
+      this.cornerPermutation[1] % 2 === 1 &&
+      this.cornerPermutation[3] % 2 === 1 &&
+      this.cornerPermutation[5] % 2 === 1 &&
+      this.cornerPermutation[7] % 2 === 1 &&
+      (this.edgePermutation[0] === 0 ||
+        this.edgePermutation[0] === 2 ||
+        this.edgePermutation[0] === 8 ||
+        this.edgePermutation[0] === 10) &&
+      (this.edgePermutation[2] === 0 ||
+        this.edgePermutation[2] === 2 ||
+        this.edgePermutation[2] === 8 ||
+        this.edgePermutation[2] === 10) &&
+      (this.edgePermutation[8] === 0 ||
+        this.edgePermutation[8] === 2 ||
+        this.edgePermutation[8] === 8 ||
+        this.edgePermutation[8] === 10) &&
+      (this.edgePermutation[10] === 0 ||
+        this.edgePermutation[10] === 2 ||
+        this.edgePermutation[10] === 8 ||
+        this.edgePermutation[10] === 10) &&
+      (this.edgePermutation[1] === 1 ||
+        this.edgePermutation[1] === 3 ||
+        this.edgePermutation[1] === 9 ||
+        this.edgePermutation[1] === 11) &&
+      (this.edgePermutation[3] === 1 ||
+        this.edgePermutation[3] === 3 ||
+        this.edgePermutation[3] === 9 ||
+        this.edgePermutation[3] === 11) &&
+      (this.edgePermutation[9] === 1 ||
+        this.edgePermutation[9] === 3 ||
+        this.edgePermutation[9] === 9 ||
+        this.edgePermutation[9] === 11) &&
+      (this.edgePermutation[11] === 1 ||
+        this.edgePermutation[11] === 3 ||
+        this.edgePermutation[11] === 9 ||
+        this.edgePermutation[11] === 11)
     );
   }
 
